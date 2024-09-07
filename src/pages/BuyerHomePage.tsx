@@ -1,8 +1,11 @@
+import Header from "../components/tsx/Header";
 
 const BuyerHomePage = () => {
   return (
-    <div>BuyerHomePage</div>
-  )
-}
+    <>
+      <Header pageName={"Buyers Home Page"} />
+    </>
+  );
+};
 
-export default BuyerHomePage
+export default BuyerHomePage;

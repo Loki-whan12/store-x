@@ -1,8 +1,11 @@
+import Header from "../components/tsx/Header";
 
 const SignUpPage = () => {
   return (
-    <div>SignUpPage</div>
-  )
-}
+    <>
+      <Header pageName={"Sign up"} />
+    </>
+  );
+};
 
-export default SignUpPage
+export default SignUpPage;

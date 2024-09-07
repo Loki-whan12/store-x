@@ -1,8 +1,28 @@
+import Header from "../components/tsx/Header";
+import { useNavigate } from "react-router-dom";
+import { useUser } from "../UserProvider";
 
 const LoginPage = () => {
-  return (
-    <div>LoginPage</div>
-  )
-}
+  const navigate = useNavigate();
+  const { login } = useUser();
 
-export default LoginPage
+  const handleLogin = () => {
+    const user = {
+      fullName: "John Doe",
+    };
+
+    login(user);
+    navigate("/");
+  };
+
+  return (
+    <>
+      <Header pageName={"Login Page"} />
+      <div>
+        <button onClick={handleLogin}>Login</button>
+      </div>
+    </>
+  );
+};
+
+export default LoginPage;
