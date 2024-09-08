@@ -7,7 +7,15 @@ const SignUpPage = () => {
   return (
     <>
       <Header pageName={"Sign up"} />
-      <BuildUI />
+      <BuildUI
+        onSubmit={function (formData: {
+          username: string;
+          password: string;
+          email: string;
+          firstName: String;
+          lastName: string;
+        }): void {}}
+      />
       <Footer />
     </>
   );

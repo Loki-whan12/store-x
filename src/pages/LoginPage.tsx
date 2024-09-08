@@ -1,6 +1,8 @@
 import Header from "../components/tsx/Header";
 import { useNavigate } from "react-router-dom";
 import { useUser } from "../UserProvider";
+import Footer from "../components/tsx/Footer";
+import LoginUI from "../components/tsx/Login/BuildUI";
 
 const LoginPage = () => {
   const navigate = useNavigate();
@@ -21,6 +23,8 @@ const LoginPage = () => {
       <div>
         <button onClick={handleLogin}>Login</button>
       </div>
+      <LoginUI />
+      <Footer />
     </>
   );
 };

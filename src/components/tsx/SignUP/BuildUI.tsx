@@ -1,19 +1,37 @@
 import { useEffect, useState } from "react";
 
-const BuildUI = () => {
+interface Props {
+  onSubmit: (formData: {
+    username: string;
+    password: string;
+    email: string;
+    firstName: string;
+    lastName: string;
+  }) => void;
+}
+
+const BuildUI = ({ onSubmit }: Props) => {
   // State hooks for fields that require validation
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [passwordMatch, setPasswordMatch] = useState(true);
   const [isPasswordValid, setIsPasswordValid] = useState(true);
   const [firstName, setFirstName] = useState("");
+  const [isFirstNameValid, setIsFirstNameValid] = useState(true);
   const [lastName, setLastName] = useState("");
+  const [isLastNameValid, setIsLastNameValid] = useState(true);
   const [email, setEmail] = useState("");
+  const [username, setUsername] = useState("");
+  const [isUsernameValid, setIsUsernameValid] = useState(true);
   const [isEmailValid, setIsEmailValid] = useState(true);
   const [agreeToTerms, setAgreeToTerms] = useState(false);
   const [isFormValid, setIsFormValid] = useState(false);
   const [touchedPassword, setTouchedPassword] = useState(false);
   const [touchedConfirmPassword, setTouchedConfirmPassword] = useState(false);
+  const [touchedFirstName, setTouchedFirstName] = useState(false);
+  const [touchedLastName, setTouchedLastName] = useState(false);
+  const [touchedUsername, setTouchedUsername] = useState(false);
+  const [touchedEmail, setTouchedEmail] = useState(false);
 
   // Email validation regex (basic example)
   const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -23,6 +41,86 @@ const BuildUI = () => {
     const value = e.target.value;
     setEmail(value);
     setIsEmailValid(emailRegex.test(value)); // Validate email with regex
+  };
+
+  // Check password length
+  useEffect(() => {
+    setIsPasswordValid(password.length >= 8);
+  }, [password]);
+
+  // Compare password and confirm password
+  useEffect(() => {
+    setPasswordMatch(confirmPassword === password);
+  }, [password, confirmPassword]);
+
+  // Check username length
+  useEffect(() => {
+    setIsUsernameValid(username.length >= 8);
+  }, [username]);
+
+  // Check first name length
+  useEffect(() => {
+    setIsFirstNameValid(firstName.length >= 5);
+  }, [firstName]);
+
+  // Check last name length
+  useEffect(() => {
+    setIsLastNameValid(lastName.length >= 5);
+  }, [lastName]);
+
+  // Check email validity
+  useEffect(() => {
+    setIsEmailValid(emailRegex.test(email));
+  }, [email]);
+
+  // Check if the form is valid whenever inputs change
+  useEffect(() => {
+    const formValid =
+      firstName.trim() !== "" &&
+      lastName.trim() !== "" &&
+      email.trim() !== "" &&
+      username.trim() !== "" &&
+      isPasswordValid &&
+      passwordMatch &&
+      isFirstNameValid &&
+      isLastNameValid &&
+      isUsernameValid &&
+      agreeToTerms;
+    setIsFormValid(formValid);
+  }, [
+    firstName,
+    lastName,
+    username,
+    email,
+    isPasswordValid,
+    passwordMatch,
+    agreeToTerms,
+    isFirstNameValid,
+    isLastNameValid,
+    isUsernameValid,
+  ]);
+
+  // Helper function to disable the default form submission behavior and perform custom behavior
+  const handleSubmit = (event: { preventDefault: () => void }) => {
+    event.preventDefault();
+    if (isFormValid) {
+      onSubmit({
+        username: username,
+        password: confirmPassword,
+        email: email,
+        firstName: firstName,
+        lastName: lastName,
+      });
+
+      alert("Form submitted");
+    } else {
+      alert("Please correct the errors in the form.");
+    }
+  };
+
+  // Helper function to update the agreement state
+  const handleAgreeChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setAgreeToTerms(e.target.checked);
   };
 
   // Helper function to update the password state
@@ -39,52 +137,6 @@ const BuildUI = () => {
     setTouchedConfirmPassword(true); // Mark confirm password field as touched
   };
 
-  // Helper function to update the agreement state
-  const handleAgreeChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setAgreeToTerms(e.target.checked);
-  };
-
-  // Check password length
-  useEffect(() => {
-    setIsPasswordValid(password.length >= 8);
-  }, [password]);
-
-  // Compare password and confirm password
-  useEffect(() => {
-    setPasswordMatch(
-      confirmPassword.length > 0 && password === confirmPassword
-    );
-  }, [password, confirmPassword]);
-
-  // Check if the form is valid whenever inputs change
-  useEffect(() => {
-    const formValid =
-      firstName.trim() !== "" &&
-      lastName.trim() !== "" &&
-      email.trim() !== "" &&
-      isPasswordValid &&
-      passwordMatch &&
-      agreeToTerms;
-    setIsFormValid(formValid);
-  }, [
-    firstName,
-    lastName,
-    email,
-    isPasswordValid,
-    passwordMatch,
-    agreeToTerms,
-  ]);
-
-  // Helper function to disable the default form submission behavior and perform custom behavior
-  const handleSubmit = (event: { preventDefault: () => void }) => {
-    event.preventDefault();
-    if (isFormValid) {
-      alert("Form submitted successfully!");
-    } else {
-      alert("Please correct the errors in the form.");
-    }
-  };
-
   return (
     <div className="sign-up-form-container">
       <form
@@ -99,14 +151,21 @@ const BuildUI = () => {
           </label>
           <input
             type="text"
-            className="form-control"
+            className={`form-control ${
+              !isFirstNameValid && touchedFirstName ? "is-invalid" : ""
+            }`}
             id="validationCustom01"
             placeholder="First Name"
             value={firstName}
             onChange={(e) => setFirstName(e.target.value)}
+            onBlur={() => setTouchedFirstName(true)}
             required
           />
-          <div className="valid-feedback">Looks good!</div>
+          {!isFirstNameValid && touchedFirstName && (
+            <div className="invalid-feedback">
+              First name must be at least 5 characters long.
+            </div>
+          )}
         </div>
 
         {/* Last name text input */}
@@ -116,14 +175,45 @@ const BuildUI = () => {
           </label>
           <input
             type="text"
-            className="form-control"
+            className={`form-control ${
+              !isLastNameValid && touchedLastName ? "is-invalid" : ""
+            }`}
             id="validationCustom02"
-            placeholder="Last name"
+            placeholder="Last Name"
             value={lastName}
             onChange={(e) => setLastName(e.target.value)}
+            onBlur={() => setTouchedLastName(true)}
             required
           />
-          <div className="valid-feedback">Looks good!</div>
+          {!isLastNameValid && touchedLastName && (
+            <div className="invalid-feedback">
+              Last name must be at least 5 characters long.
+            </div>
+          )}
+        </div>
+
+        {/* Username text input */}
+        <div className="mb-3">
+          <label htmlFor="validationCustom003" className="form-label">
+            Username
+          </label>
+          <input
+            type="text"
+            className={`form-control ${
+              !isUsernameValid && touchedUsername ? "is-invalid" : ""
+            }`}
+            id="validationCustom003"
+            placeholder="Username"
+            value={username}
+            onChange={(e) => setUsername(e.target.value)}
+            onBlur={() => setTouchedUsername(true)}
+            required
+          />
+          {!isUsernameValid && touchedUsername && (
+            <div className="invalid-feedback">
+              Username must be at least 8 characters long.
+            </div>
+          )}
         </div>
 
         {/* Email text input */}
@@ -133,74 +223,67 @@ const BuildUI = () => {
           </label>
           <input
             type="email"
-            className={`form-control ${!isEmailValid ? "is-invalid" : ""}`}
+            className={`form-control ${
+              !isEmailValid && touchedEmail ? "is-invalid" : ""
+            }`}
             id="exampleFormControlInput1"
             placeholder="name@example.com"
             value={email}
-            onChange={handleEmailChange}
+            onChange={(e) => handleEmailChange(e)}
+            onBlur={() => setTouchedEmail(true)}
             required
           />
-          <div className="invalid-feedback">
-            Please enter a valid email address.
-          </div>
+          {!isEmailValid && touchedEmail && (
+            <div className="invalid-feedback">
+              Please enter a valid email address.
+            </div>
+          )}
         </div>
 
         {/* Password text input */}
         <div className="mb-3">
-          <div className="col-auto">
-            <label htmlFor="inputPassword6" className="col-form-label">
-              Password
-            </label>
-          </div>
-          <div className="col-auto">
-            <input
-              value={password}
-              onChange={handlePasswordChange}
-              type="password"
-              id="inputPassword6"
-              className={`form-control ${
-                !isPasswordValid && touchedPassword ? "is-invalid" : ""
-              }`}
-              aria-describedby="passwordHelpInline"
-              required
-            />
-          </div>
-          <div className="col-auto">
-            {!isPasswordValid && touchedPassword && (
-              <span id="passwordHelpInline" className="form-text">
-                Must be at least 8 characters long.
-              </span>
-            )}
-          </div>
+          <label htmlFor="inputPassword6" className="col-form-label">
+            Password
+          </label>
+          <input
+            type="password"
+            id="inputPassword6"
+            className={`form-control ${
+              !isPasswordValid && touchedPassword ? "is-invalid" : ""
+            }`}
+            aria-describedby="passwordHelpInline"
+            value={password}
+            onChange={(e) => handlePasswordChange(e)}
+            onBlur={() => setTouchedPassword(true)}
+            required
+          />
+          {!isPasswordValid && touchedPassword && (
+            <div className="invalid-feedback">
+              Password must be at least 8 characters long.
+            </div>
+          )}
         </div>
 
         {/* Confirm password field */}
         <div className="mb-3">
-          <div className="col-auto">
-            <label htmlFor="inputPassword7" className="col-form-label">
-              Confirm Password
-            </label>
-          </div>
-          <div className="col-auto">
-            <input
-              onChange={handleConfirmPasswordChange}
-              value={confirmPassword}
-              type="password"
-              id="inputPassword7"
-              className={`form-control ${
-                !passwordMatch && touchedConfirmPassword ? "is-invalid" : ""
-              }`}
-              aria-describedby="passwordHelpInline"
-              required
-            />
-          </div>
-          <div className="col-auto">
-            {!passwordMatch && touchedConfirmPassword && (
-              <span id="passwordHelpInline" className="form-text">
-                Passwords do not match.
-              </span>
-            )}
-          </div>
+          <label htmlFor="inputPassword7" className="col-form-label">
+            Confirm Password
+          </label>
+          <input
+            type="password"
+            id="inputPassword7"
+            className={`form-control ${
+              !passwordMatch && touchedConfirmPassword ? "is-invalid" : ""
+            }`}
+            aria-describedby="passwordHelpInline"
+            value={confirmPassword}
+            onChange={(e) => handleConfirmPasswordChange(e)}
+            onBlur={() => setTouchedConfirmPassword(true)}
+            required
+          />
+          {!passwordMatch && touchedConfirmPassword && (
+            <div className="invalid-feedback">Passwords do not match.</div>
+          )}
         </div>
 
         {/* Agree to terms and conditions */}
@@ -217,22 +300,22 @@ const BuildUI = () => {
             <label className="form-check-label" htmlFor="invalidCheck">
               Agree to terms and conditions
             </label>
-            <div className="invalid-feedback">
-              You must agree before submitting.
-            </div>
+            {!agreeToTerms && (
+              <div className="invalid-feedback">
+                You must agree before submitting.
+              </div>
+            )}
           </div>
         </div>
 
         {/* Submit button */}
-        <div className="col-12">
-          <button
-            className="btn btn-primary"
-            type="submit"
-            disabled={!isFormValid}
-          >
-            Submit form
-          </button>
-        </div>
+        <button
+          className="btn btn-primary"
+          type="submit"
+          disabled={!isFormValid}
+        >
+          Submit form
+        </button>
       </form>
     </div>
   );
