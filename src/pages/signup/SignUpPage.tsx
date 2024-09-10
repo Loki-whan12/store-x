@@ -38,7 +38,7 @@ const SignUpPage = () => {
           message={"Your Account has been created.."}
         />
       )}
-      <Footer />
+      {user ? <></> : <Footer />}
     </>
   );
 };

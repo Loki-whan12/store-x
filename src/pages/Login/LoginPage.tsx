@@ -11,7 +11,7 @@ const LoginPage = () => {
   const message =
     "Sorry you are already logged in! Click the button below to go home.";
   const buttonText = "Go to home";
-  const route = "/";
+  const route = "/home";
   return (
     <>
       <Header pageName={"Login Page"} pageLink={"/login"} />
@@ -26,7 +26,7 @@ const LoginPage = () => {
       ) : (
         <LoginUI />
       )}
-      <Footer />
+      {user ? <></> : <Footer />}
     </>
   );
 };

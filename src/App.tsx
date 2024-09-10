@@ -7,6 +7,7 @@ import SellerHomePage from "./pages/SellerHomePage";
 import NotFoundPage from "./pages/NotFoundPage";
 import SignUpSeller from "./pages/signup/SignUpSeller";
 import LoginPageSeller from "./pages/Login/LoginPageSeller";
+import Home from "./pages/Home";
 
 function App() {
   return (
@@ -19,6 +20,7 @@ function App() {
         <Route path="/signup-seller" element={<SignUpSeller />} />
         <Route path="/buyer" element={<BuyerHomePage />} />
         <Route path="/seller" element={<SellerHomePage />} />
+        <Route path="/home" element={<Home />} />
         <Route path="*" element={<NotFoundPage />} />
       </Routes>
     </BrowserRouter>

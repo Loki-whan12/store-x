@@ -16,9 +16,14 @@ const SignUpPage = () => {
   const { user } = useUser();
   const title = "Not Loggen in User Account";
   const message =
-    "Sorry you can only create an account if you have a user account!";
-  const buttonText = "Go to register";
+    "Sorry you can only create a sellers account if you own a user account!";
+  const buttonText = "Register";
   const route = "/signup";
+  const title2 = "Already Have A Buyer's Account";
+  const message2 =
+    "Sorry you can only create one seller's account per user account!";
+  const buttonText2 = "Log into seller account";
+  const route2 = "/login-seller";
 
   return (
     <>
@@ -29,6 +34,13 @@ const SignUpPage = () => {
           message={message}
           buttonText={buttonText}
           route={route}
+        />
+      ) : !user.has_created_seller_account ? (
+        <Already
+          title={title2}
+          message={message2}
+          buttonText={buttonText2}
+          route={route2}
         />
       ) : (
         <BuildUISeller
@@ -41,7 +53,9 @@ const SignUpPage = () => {
           message={"Your Seller Account has been created.."}
         />
       )}
-      <Footer />
+
+      {!user?.has_created_seller_account ? <></> : <Footer />}
+      {user ? <></> : <Footer />}
     </>
   );
 };
