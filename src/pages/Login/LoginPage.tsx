@@ -3,7 +3,7 @@ import Footer from "../../components/tsx/Footer";
 import LoginUI from "../../components/tsx/Login/BuildUI";
 import { useUser } from "../../UserProvider";
 import Already from "../../components/tsx/Already";
-import "../components/css/Already.css";
+import "../../components/css/Already.css";
 
 const LoginPage = () => {
   const { user } = useUser();

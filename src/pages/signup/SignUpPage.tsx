@@ -1,6 +1,6 @@
 import Footer from "../../components/tsx/Footer";
 import Header from "../../components/tsx/Header";
-import "../components/css/SignUpPage.css";
+import "../../components/css/SignUpPage.css";
 import BuildUI from "../../components/tsx/SignUP/BuildUI";
 import ToastComponent from "../../components/tsx/Toast";
 import { useState } from "react";
