@@ -93,6 +93,7 @@ const BuildUI = ({ handleHasCreatedAccountToast }: Props) => {
       isFirstNameValid &&
       isLastNameValid &&
       isUsernameValid &&
+      isEmailValid &&
       agreeToTerms;
     setIsFormValid(formValid);
   }, [
@@ -106,6 +107,7 @@ const BuildUI = ({ handleHasCreatedAccountToast }: Props) => {
     isFirstNameValid,
     isLastNameValid,
     isUsernameValid,
+    isEmailValid,
   ]);
 
   // Helper function to disable the default form submission behavior and perform custom behavior
@@ -362,7 +364,7 @@ const BuildUI = ({ handleHasCreatedAccountToast }: Props) => {
               type="submit"
               disabled={!isFormValid}
             >
-              Submit form
+              Create Account
             </button>
           )}
           {isError && <p className="error">{error}</p>}

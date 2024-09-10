@@ -64,6 +64,7 @@ const LoginUI = () => {
     email: "",
     username: "",
     password: "",
+    has_created_seller_account: false,
   };
 
   // Helper function to disable the default form submission behavior and perform custom behavior
@@ -91,6 +92,8 @@ const LoginUI = () => {
             user.email = data["email"];
             user.username = data["username"];
             user.password = data["password"];
+            user.has_created_seller_account =
+              data["has_created_seller_account"];
             login(user);
             setUsername("");
             setPassword("");
