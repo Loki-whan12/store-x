@@ -1,11 +1,11 @@
-import Footer from "../components/tsx/Footer";
-import Header from "../components/tsx/Header";
+import Footer from "../../components/tsx/Footer";
+import Header from "../../components/tsx/Header";
 import "../components/css/SignUpPage.css";
-import BuildUI from "../components/tsx/SignUP/BuildUI";
-import ToastComponent from "../components/tsx/Toast";
+import BuildUI from "../../components/tsx/SignUP/BuildUI";
+import ToastComponent from "../../components/tsx/Toast";
 import { useState } from "react";
-import { useUser } from "../UserProvider";
-import Already from "../components/tsx/Already";
+import { useUser } from "../../UserProvider";
+import Already from "../../components/tsx/Already";
 
 const SignUpPage = () => {
   const [hasCreatedAccount, setHasCreatedAccount] = useState(false);
