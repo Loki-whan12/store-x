@@ -19,7 +19,7 @@ const LandingPage = () => {
         <hr />
         <LandingPageBuyers navigate={() => navigateTo("/signup")} />
         <hr />
-        <LandingPageSellers navigate={() => navigateTo("/signup")} />
+        <LandingPageSellers navigate={() => navigateTo("/signup-seller")} />
         <hr />
       </main>
 
