@@ -15,7 +15,7 @@ const LandingPage = () => {
       <CarouselSlider />
       <main className="content-conatiner">
         <hr />
-        <LandingPageWelcomeInfo navigate={() => navigateTo("/buyer")} />
+        <LandingPageWelcomeInfo navigate={() => navigateTo("/home")} />
         <hr />
         <LandingPageBuyers navigate={() => navigateTo("/signup")} />
         <hr />

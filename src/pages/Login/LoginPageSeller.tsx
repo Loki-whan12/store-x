@@ -1,22 +1,26 @@
 import Header from "../../components/tsx/Header";
 import Footer from "../../components/tsx/Footer";
-import LoginUI from "../../components/tsx/Login/BuildUI";
-import { useUser } from "../../UserProvider";
 import Already from "../../components/tsx/Already";
 import "../../components/css/Already.css";
+import { useSeller } from "../../SellerProvider";
+import LoginUISeller from "../../components/tsx/Login/BuildUISeller";
+import { useUser } from "../../UserProvider";
 
 const LoginPageSellers = () => {
+  const { seller } = useSeller();
   const { user } = useUser();
   const title = "Already Logged In";
   const message =
     "Sorry you are already logged in! Click the button below to go home.";
   const buttonText = "Go to home";
-  const route = "/sellers";
+  const route = "/seller";
+  console.log(seller);
+  console.log(user);
   return (
     <>
-      <Header pageName={"Login Page"} pageLink={"/login"} />
+      <Header pageName={"Seller Login Page"} pageLink={"/login-seller"} />
 
-      {user ? (
+      {seller ? (
         <Already
           title={title}
           message={message}
@@ -24,9 +28,9 @@ const LoginPageSellers = () => {
           route={route}
         />
       ) : (
-        <LoginUI />
+        <LoginUISeller />
       )}
-      {user ? <></> : <Footer />}
+      {seller ? <></> : <Footer />}
     </>
   );
 };

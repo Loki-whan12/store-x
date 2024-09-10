@@ -6,8 +6,9 @@ import { getBackendUrl } from "../../utils/Utils";
 import Spinner from "../Spinner";
 import Already from "../Already";
 import "../../css/AlreadyClick.css";
+import { useSeller } from "../../../SellerProvider";
 
-const LoginUI = () => {
+const LoginUISeller = () => {
   // State hooks for fields that require validation
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
@@ -27,7 +28,9 @@ const LoginUI = () => {
   // For navigation
   const navigate = useNavigate();
   //User state
-  const { login } = useUser();
+  const { login, user } = useUser();
+  //seller state
+  const { loginSeller } = useSeller();
 
   // Helper function to update the username state
   const handleUsernameChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -58,7 +61,8 @@ const LoginUI = () => {
   }, [isUsernameValid, isPasswordValid]);
 
   //User model to be populated by data returned from the database
-  const user = {
+  // if the user is not logged into the user account already
+  const userModel = {
     first_name: "",
     last_name: "",
     email: "",
@@ -67,14 +71,30 @@ const LoginUI = () => {
     has_created_seller_account: "false",
   };
 
-  // Helper function to disable the default form submission behavior and perform custom behavior
+  //Seller model to be populated by data returned from the database
+  const sellerModel = {
+    username: "",
+    seller_name: "",
+    seller_id: "",
+    password: "",
+    hasSellerAccountBeenApproved: "false",
+  };
+  // Function to handle form submission with improved error handling and state management
   const handleSubmit = async (event: { preventDefault: () => void }) => {
     event.preventDefault();
-    if (isFormValid) {
-      setIsLoading(true);
-      setIsError(false);
-      try {
-        const response = await fetch(
+    if (!isFormValid) {
+      alert("Please correct the errors in the form.");
+      return;
+    }
+
+    setIsLoading(true);
+    setIsError(false);
+    setError(""); // Reset the error message
+
+    try {
+      // If user is not already logged in, fetch user data
+      if (!user) {
+        const userResponse = await fetch(
           `${getBackendUrl()}/users/get-user-by-username/${username}`,
           {
             method: "GET",
@@ -84,40 +104,80 @@ const LoginUI = () => {
           }
         );
 
-        const data = await response.json();
-        if (response.ok) {
-          if (password === data["password"]) {
-            user.first_name = data["first_name"];
-            user.last_name = data["last_name"];
-            user.email = data["email"];
-            user.username = data["username"];
-            user.password = data["password"];
-            user.has_created_seller_account =
-              data["has_created_seller_account"];
-            login(user);
-            setUsername("");
-            setPassword("");
-            setIsFormValid(false);
-            setTouchedPassword(false);
-            setTouchedUsername(false);
-            navigate("/");
-          } else {
-            setIsError(true);
-            setError("Sorry the password you enetered incorrect!");
-          }
-        } else {
+        const data = await userResponse.json();
+
+        if (!userResponse.ok) {
           setIsError(true);
-          setError(data["message"]);
+          setError(
+            data.message || "An error occurred while fetching user data."
+          );
+          return;
         }
-      } catch (error) {
-        setIsError(true);
-        setError("Sorry, an error has occured, Please try again..");
-        setIsLoading(false);
-      } finally {
-        setIsLoading(false);
+
+        // Populate the user model
+        Object.assign(userModel, {
+          first_name: data.first_name,
+          last_name: data.last_name,
+          email: data.email,
+          username: data.username,
+          password: data.password,
+          has_created_seller_account: data.has_created_seller_account,
+        });
+
+        // Log the user in
+        login(userModel);
+        setUsername("");
+        setPassword("");
+        setIsFormValid(false);
+        setTouchedPassword(false);
+        setTouchedUsername(false);
       }
-    } else {
-      alert("Please correct the errors in the form.");
+
+      // Fetch seller data regardless of user status
+      const sellerResponse = await fetch(
+        `${getBackendUrl()}/sellers/get-seller/${username}`,
+        {
+          method: "GET",
+          headers: {
+            "Content-Type": "application/json",
+          },
+        }
+      );
+
+      const sellerData = await sellerResponse.json();
+
+      if (!sellerResponse.ok) {
+        setIsError(true);
+        setError(
+          sellerData.message || "An error occurred while fetching seller data."
+        );
+        return;
+      }
+
+      // Check if the password matches for seller
+      if (password !== sellerData.password) {
+        setIsError(true);
+        setError("Sorry, the password you entered is incorrect!");
+        return;
+      }
+
+      // Populate the seller model
+      Object.assign(sellerModel, {
+        username: sellerData.username,
+        seller_name: sellerData.seller_name,
+        seller_id: sellerData.seller_id,
+        password: sellerData.password,
+        hasSellerAccountBeenApproved: sellerData.has_been_approved,
+      });
+
+      // Log the seller in
+      loginSeller(sellerModel);
+      navigate("/seller");
+    } catch (error) {
+      setIsError(true);
+      setError("Sorry, an error has occurred. Please try again.");
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -205,4 +265,4 @@ const LoginUI = () => {
   );
 };
 
-export default LoginUI;
+export default LoginUISeller;

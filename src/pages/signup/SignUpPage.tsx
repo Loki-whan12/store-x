@@ -17,7 +17,7 @@ const SignUpPage = () => {
   const title = "Already Logged In";
   const message = "Sorry you cannot create an account whiles logged!";
   const buttonText = "Go to home";
-  const route = "/";
+  const route = "/home";
 
   return (
     <>

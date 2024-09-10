@@ -2,21 +2,33 @@ import Footer from "../../components/tsx/Footer";
 import Header from "../../components/tsx/Header";
 import "../../components/css/SignUpPage.css";
 import ToastComponent from "../../components/tsx/Toast";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useUser } from "../../UserProvider";
 import Already from "../../components/tsx/Already";
 import BuildUISeller from "../../components/tsx/SignUP/BuildUISeller";
 
 const SignUpPage = () => {
   const [hasCreatedAccount, setHasCreatedAccount] = useState(false);
+  const [hasCreatedAccountAlready, setHasCreatedAccountAlready] =
+    useState(false);
+
+  const { user } = useUser();
+
+  useEffect(() => {
+    if (user?.has_created_seller_account) {
+      setHasCreatedAccountAlready(true);
+    } else {
+      setHasCreatedAccountAlready(false);
+    }
+  }, [user]);
 
   const handleHasCreatedAccountToast = () => {
     setHasCreatedAccount(true);
   };
-  const { user } = useUser();
-  const title = "Not Loggen in User Account";
+
+  const title = "Not Logged in User Account";
   const message =
-    "Sorry you can only create a sellers account if you own a user account!";
+    "Sorry you can only create a seller's account if you own a user account!";
   const buttonText = "Register";
   const route = "/signup";
   const title2 = "Already Have A Buyer's Account";
@@ -35,7 +47,7 @@ const SignUpPage = () => {
           buttonText={buttonText}
           route={route}
         />
-      ) : !user.has_created_seller_account ? (
+      ) : hasCreatedAccountAlready ? (
         <Already
           title={title2}
           message={message2}
@@ -53,9 +65,7 @@ const SignUpPage = () => {
           message={"Your Seller Account has been created.."}
         />
       )}
-
-      {!user?.has_created_seller_account ? <></> : <Footer />}
-      {user ? <></> : <Footer />}
+      <Footer />
     </>
   );
 };

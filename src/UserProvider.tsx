@@ -6,7 +6,7 @@ interface User {
   email: string;
   username: string;
   password: string;
-  has_created_seller_account: boolean;
+  has_created_seller_account: string;
 }
 
 // Define context type
@@ -16,7 +16,7 @@ interface UserContextType {
   logout: () => void;
 }
 
-// Create UserContext with undefined initial value
+// Create UserContext with an undefined initial value
 const UserContext = createContext<UserContextType | undefined>(undefined);
 
 // Custom hook for using the UserContext
@@ -32,16 +32,15 @@ export const useUser = () => {
 export const UserProvider = ({ children }: { children: ReactNode }) => {
   // Initialize user state with values from localStorage
   const [user, setUser] = useState<User | null>(() => {
-    const storedFirstName = localStorage.getItem("first_name");
-    const storedLastName = localStorage.getItem("last_name");
-    const storedEmail = localStorage.getItem("email");
-    const storedUsername = localStorage.getItem("username");
-    const storedPassword = localStorage.getItem("password");
-    const storedHasCreatedSellerAccount = localStorage.getItem(
-      "has_created_seller_account"
-    );
+    const storedFirstName = localStorage.getItem("first_name") || "";
+    const storedLastName = localStorage.getItem("last_name") || "";
+    const storedEmail = localStorage.getItem("email") || "";
+    const storedUsername = localStorage.getItem("username") || "";
+    const storedPassword = localStorage.getItem("password") || "";
+    const storedHasCreatedSellerAccount =
+      localStorage.getItem("has_created_seller_account") || "false"; // default to "false" if not set
 
-    // Check if any of the required fields are missing or invalid
+    // Check if any of the required fields are missing
     if (
       storedFirstName &&
       storedLastName &&
@@ -55,9 +54,7 @@ export const UserProvider = ({ children }: { children: ReactNode }) => {
         email: storedEmail,
         username: storedUsername,
         password: storedPassword,
-        has_created_seller_account: storedHasCreatedSellerAccount
-          ? JSON.parse(storedHasCreatedSellerAccount)
-          : false,
+        has_created_seller_account: storedHasCreatedSellerAccount,
       };
     }
     return null;
@@ -73,7 +70,7 @@ export const UserProvider = ({ children }: { children: ReactNode }) => {
     localStorage.setItem("password", user.password);
     localStorage.setItem(
       "has_created_seller_account",
-      JSON.stringify(user.has_created_seller_account)
+      user.has_created_seller_account
     );
   };
 
