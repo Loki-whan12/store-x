@@ -11,7 +11,7 @@ const LandingPage = () => {
   const navigateTo = navigateToRoute();
   return (
     <>
-      <Header pageName={"STORE - X"} />
+      <Header pageName={"STORE - X"} pageLink={"/"} />
       <CarouselSlider />
       <main className="content-conatiner">
         <hr />
@@ -22,6 +22,7 @@ const LandingPage = () => {
         <LandingPageSellers navigate={() => navigateTo("/signup")} />
         <hr />
       </main>
+
       <Footer />
     </>
   );

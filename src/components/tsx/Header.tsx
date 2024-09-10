@@ -5,16 +5,17 @@ import "../css/Header.css";
 
 interface Props {
   pageName: string;
+  pageLink: string;
 }
 
-const Header = ({ pageName }: Props) => {
+const Header = ({ pageName, pageLink }: Props) => {
   const { user, logout } = useUser();
   const navigateTo = navigateToRoute();
 
   return (
     <nav className="navbar navbar-expand-lg navbar-light bg-light">
       <div className="container-fluid">
-        <a className="navbar-brand" href="/">
+        <a className="navbar-brand" href={pageLink}>
           {pageName}
         </a>
         <div className="collapse navbar-collapse">
@@ -22,12 +23,12 @@ const Header = ({ pageName }: Props) => {
             {user ? (
               <>
                 <Avatar
-                  name={user.fullName}
+                  name={`${user.first_name} ${user.last_name}`}
                   size="40"
                   round={true}
                   className="me-2"
                 />
-                <span className="navbar-text me-2">{user.fullName}</span>
+                <span className="navbar-text me-2">{`${user.first_name} ${user.last_name}`}</span>
                 <button
                   className="btn btn-outline-danger"
                   type="button"

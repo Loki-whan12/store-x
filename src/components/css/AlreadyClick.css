@@ -1,0 +1,11 @@
+.sign-up-form-container .already-account-container,
+.login-form-container .already-account-container{
+    height: fit-content;
+    align-items: start;
+    padding: 0;
+    margin-top: 2rem;
+}
+
+.sign-up-form-container .already-button {
+    margin-top: 0;
+}

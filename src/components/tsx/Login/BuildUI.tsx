@@ -1,5 +1,11 @@
 import { useEffect, useState } from "react";
 import "../../css/Login.css";
+import { useNavigate } from "react-router-dom";
+import { useUser } from "../../../UserProvider";
+import { getBackendUrl } from "../../utils/Utils";
+import Spinner from "../Spinner";
+import Already from "../Already";
+import "../../css/AlreadyClick.css";
 
 const LoginUI = () => {
   // State hooks for fields that require validation
@@ -13,21 +19,31 @@ const LoginUI = () => {
   const [touchedUsername, setTouchedUsername] = useState(false);
   const [touchedPassword, setTouchedPassword] = useState(false);
 
+  // State hooks for form status and error handling
+  const [isLoading, setIsLoading] = useState(false);
+  const [isError, setIsError] = useState(false);
+  const [error, setError] = useState("");
+
+  // For navigation
+  const navigate = useNavigate();
+  //User state
+  const { login } = useUser();
+
   // Helper function to update the username state
   const handleUsernameChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setUsername(e.target.value);
-    setTouchedUsername(true); // Mark username field as touched
+    setTouchedUsername(true);
   };
 
   // Helper function to update the password state
   const handlePasswordChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setPassword(e.target.value);
-    setTouchedPassword(true); // Mark password field as touched
+    setTouchedPassword(true);
   };
 
-  // Check username length (basic validation for demonstration)
+  // Check username length
   useEffect(() => {
-    setIsUsernameValid(username.trim().length > 0);
+    setIsUsernameValid(username.trim().length >= 5);
   }, [username]);
 
   // Check password length
@@ -41,11 +57,62 @@ const LoginUI = () => {
     setIsFormValid(formValid);
   }, [isUsernameValid, isPasswordValid]);
 
+  //User model to be populated by data returned from the database
+  const user = {
+    first_name: "",
+    last_name: "",
+    email: "",
+    username: "",
+    password: "",
+  };
+
   // Helper function to disable the default form submission behavior and perform custom behavior
-  const handleSubmit = (event: { preventDefault: () => void }) => {
+  const handleSubmit = async (event: { preventDefault: () => void }) => {
     event.preventDefault();
     if (isFormValid) {
-      alert("Login successful!");
+      setIsLoading(true);
+      setIsError(false);
+      try {
+        const response = await fetch(
+          `${getBackendUrl()}/users/get-user-by-username/${username}`,
+          {
+            method: "GET",
+            headers: {
+              "Content-Type": "application/json",
+            },
+          }
+        );
+
+        const data = await response.json();
+        if (response.ok) {
+          if (password === data["password"]) {
+            user.first_name = data["first_name"];
+            user.last_name = data["last_name"];
+            user.email = data["email"];
+            user.username = data["username"];
+            user.password = data["password"];
+            login(user);
+            setUsername("");
+            setPassword("");
+            setIsFormValid(false);
+            setTouchedPassword(false);
+            setTouchedUsername(false);
+            navigate("/");
+          } else {
+            setIsError(true);
+            setError("Sorry the password you enetered incorrect!");
+          }
+        } else {
+          setIsError(true);
+          setError(data["message"]);
+        }
+      } catch (error) {
+        setIsError(true);
+        setError("Sorry, an error has occured, Please try again..");
+        setIsLoading(false);
+      } finally {
+        setIsLoading(false);
+      }
     } else {
       alert("Please correct the errors in the form.");
     }
@@ -75,7 +142,9 @@ const LoginUI = () => {
             onBlur={() => setTouchedUsername(true)}
             required
           />
-          <div className="invalid-feedback">Please enter a valid username.</div>
+          <div className="invalid-feedback">
+            Please username cannot be lass than 5.
+          </div>
         </div>
 
         {/* Password text input */}
@@ -108,15 +177,26 @@ const LoginUI = () => {
         </div>
 
         {/* Submit button */}
-        <div className="col-12">
-          <button
-            className="btn btn-primary"
-            type="submit"
-            disabled={!isFormValid}
-          >
-            Login
-          </button>
-        </div>
+        {isLoading ? (
+          <Spinner />
+        ) : (
+          <div className="col-12">
+            <button
+              className="btn btn-primary"
+              type="submit"
+              disabled={!isFormValid}
+            >
+              Login
+            </button>
+          </div>
+        )}
+        {isError && <p className="error">{error}</p>}
+        <Already
+          title={"Do you have an account?"}
+          message={"Click the button below to sign up for an account."}
+          buttonText={"Sign up"}
+          route={"/signup"}
+        />
       </form>
     </div>
   );
