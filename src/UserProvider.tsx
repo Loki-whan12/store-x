@@ -1,22 +1,25 @@
 import { createContext, useContext, useState, ReactNode } from "react";
 
-// Define UserContext and UserProvider
 interface User {
   first_name: string;
   last_name: string;
   email: string;
   username: string;
   password: string;
+  has_created_seller_account: boolean;
 }
 
+// Define context type
 interface UserContextType {
   user: User | null;
   login: (user: User) => void;
   logout: () => void;
 }
 
+// Create UserContext with undefined initial value
 const UserContext = createContext<UserContextType | undefined>(undefined);
 
+// Custom hook for using the UserContext
 export const useUser = () => {
   const context = useContext(UserContext);
   if (!context) {
@@ -25,16 +28,20 @@ export const useUser = () => {
   return context;
 };
 
+// UserProvider component
 export const UserProvider = ({ children }: { children: ReactNode }) => {
+  // Initialize user state with values from localStorage
   const [user, setUser] = useState<User | null>(() => {
-    // Retrieve the user information from localStorage when the app loads
     const storedFirstName = localStorage.getItem("first_name");
     const storedLastName = localStorage.getItem("last_name");
     const storedEmail = localStorage.getItem("email");
     const storedUsername = localStorage.getItem("username");
     const storedPassword = localStorage.getItem("password");
+    const storedHasCreatedSellerAccount = localStorage.getItem(
+      "has_created_seller_account"
+    );
 
-    // Return the user object if all required fields are available
+    // Check if any of the required fields are missing or invalid
     if (
       storedFirstName &&
       storedLastName &&
@@ -48,29 +55,37 @@ export const UserProvider = ({ children }: { children: ReactNode }) => {
         email: storedEmail,
         username: storedUsername,
         password: storedPassword,
+        has_created_seller_account: storedHasCreatedSellerAccount
+          ? JSON.parse(storedHasCreatedSellerAccount)
+          : false,
       };
     }
     return null;
   });
 
+  // Function to log in a user and store details in localStorage
   const login = (user: User) => {
     setUser(user);
-    // Store user details in localStorage
     localStorage.setItem("first_name", user.first_name);
     localStorage.setItem("last_name", user.last_name);
     localStorage.setItem("email", user.email);
     localStorage.setItem("username", user.username);
     localStorage.setItem("password", user.password);
+    localStorage.setItem(
+      "has_created_seller_account",
+      JSON.stringify(user.has_created_seller_account)
+    );
   };
 
+  // Function to log out a user and remove details from localStorage
   const logout = () => {
     setUser(null);
-    // Remove user details from localStorage
     localStorage.removeItem("first_name");
     localStorage.removeItem("last_name");
     localStorage.removeItem("email");
     localStorage.removeItem("username");
     localStorage.removeItem("password");
+    localStorage.removeItem("has_created_seller_account");
   };
 
   return (

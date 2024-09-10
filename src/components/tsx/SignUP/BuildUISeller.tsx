@@ -3,6 +3,7 @@ import Spinner from "../Spinner";
 import { getBackendUrl } from "../../utils/Utils";
 import Already from "../Already";
 import "../../css/AlreadyClick.css";
+import { useUser } from "../../../UserProvider";
 
 interface Props {
   handleHasCreatedAccountToast: () => void;
@@ -58,21 +59,17 @@ const BuildUISeller = ({ handleHasCreatedAccountToast }: Props) => {
   useEffect(() => {
     const formValid =
       sellerName.trim() !== "" &&
-      username.trim() !== "" &&
       isPasswordValid &&
       passwordMatch &&
       isSellerNameValid &&
-      isUsernameValid &&
       agreeToTerms;
     setIsFormValid(formValid);
   }, [
     sellerName,
-    username,
     isPasswordValid,
     passwordMatch,
     agreeToTerms,
     isSellerNameValid,
-    isUsernameValid,
   ]);
 
   // Helper function to disable the default form submission behavior and perform custom behavior
@@ -82,17 +79,15 @@ const BuildUISeller = ({ handleHasCreatedAccountToast }: Props) => {
       setIsLoading(true);
       setIsError(false);
       try {
-        const response = await fetch(`${getBackendUrl()}/users/add-users`, {
+        const response = await fetch(`${getBackendUrl()}/sellers/add-seller`, {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
           },
           body: JSON.stringify({
-            username: username,
+            username: user?.username,
+            seller_name: sellerName,
             password: confirmPassword,
-            // email: email,
-            // first_name: firstName,
-            // last_name: lastName,
           }),
         });
 
@@ -110,7 +105,7 @@ const BuildUISeller = ({ handleHasCreatedAccountToast }: Props) => {
           handleHasCreatedAccountToast();
         } else {
           setIsError(true);
-          setError(data["error"]);
+          setError(data["message"]);
         }
       } catch (error) {
         setIsError(true);
@@ -143,6 +138,8 @@ const BuildUISeller = ({ handleHasCreatedAccountToast }: Props) => {
     setTouchedConfirmPassword(true); // Mark confirm password field as touched
   };
 
+  const { user } = useUser();
+
   return (
     <>
       <div className="sign-up-form-container">
@@ -163,10 +160,11 @@ const BuildUISeller = ({ handleHasCreatedAccountToast }: Props) => {
               }`}
               id="validationCustom003"
               placeholder="Username"
-              value={username}
+              value={user?.username}
               onChange={(e) => setUsername(e.target.value)}
               onBlur={() => setTouchedUsername(true)}
               required
+              disabled
             />
             {!isUsernameValid && touchedUsername && (
               <div className="invalid-feedback">
